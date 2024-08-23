@@ -4,27 +4,40 @@ const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-// Include alphanumeric characters, Katakana, and Kanji
-const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン亜阿愛挨暗案意医衣育院飲運泳英営円園遠央奥音';
-const letters = Array(256).join('1').split('');
+// Characters to use in the Matrix effect
+const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン亜阿愛挨暗案意医衣';
+const fontSize = 20;
+const columns = canvas.width / fontSize;
 
-const draw = () => {
+// Create an array of drops with random initial positions
+const drops = Array.from({ length: Math.floor(columns) }, () => Math.floor(Math.random() * canvas.height / fontSize));
+
+const drawMatrix = () => {
     ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#0f0';
-    ctx.font = '20px monospace';
 
-    letters.forEach((y, index) => {
+    ctx.fillStyle = '#0f0'; // Green text color
+    ctx.font = `${fontSize}px monospace`;
+
+    drops.forEach((y, index) => {
         const text = characters[Math.floor(Math.random() * characters.length)];
-        const x = index * 20;
-        ctx.fillText(text, x, y);
-        letters[index] = y > canvas.height + Math.random() * 1e4 ? 0 : y + 20;
+        const x = index * fontSize;
+        ctx.fillText(text, x, y * fontSize);
+
+        // Randomly reset the drop to create a more varied effect
+        if (y * fontSize > canvas.height && Math.random() > 0.975) {
+            drops[index] = 0;
+        } else {
+            drops[index]++;
+        }
     });
 };
 
-setInterval(draw, 33);
+setInterval(drawMatrix, 33);
 
 window.addEventListener('resize', () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+    drops.length = Math.floor(canvas.width / fontSize);
+    drops.fill(1);
 });
